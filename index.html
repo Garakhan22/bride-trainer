@@ -3,154 +3,258 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ТРЕНАЖЕР</title>
+<title>Az → Ru тренажер 100 слов</title>
 <style>
-  *{box-sizing:border-box; font-family: system-ui, -apple-system, sans-serif}
-  body{
-    margin:0; min-height:100vh; padding:20px;
-    display:flex; justify-content:center;
-    background: #fff9f7 url('bride_bg.jpg') no-repeat center center fixed;
-    background-size: cover;
-  }
-  body::before{
-    content:''; position:fixed; inset:0;
-    background: linear-gradient(180deg, rgba(255,255,255,0.7), rgba(255,240,235,0.85));
-    z-index:-1
-  }
- .app{
-    width:100%; max-width:430px;
-    background:rgba(255,255,255,0.92);
-    backdrop-filter: blur(12px);
-    border-radius:24px; padding:26px;
-    box-shadow:0 20px 40px rgba(180,120,120,.15);
-    border:1px solid rgba(255,255,255,0.8)
-  }
-  h1{font-size:20px; text-align:center; margin:0; color:#5a3a3a}
- .sub{color:#b08d8d; text-align:center; font-size:12px; margin:6px 0 18px; letter-spacing:1px}
- .progress{height:6px; background:#f3e8e6; border-radius:10px; overflow:hidden; margin-bottom:18px}
- .bar{height:100%; background:linear-gradient(90deg, #e8a0bf, #d4a5a5); width:0%; transition:.4s}
- .card{background:linear-gradient(135deg, #fffaf9, #fff1f0); border-radius:18px; padding:20px; text-align:center; margin-bottom:16px; border:1px solid #ffe8e3}
- .az-word{font-size:34px; font-weight:800; color:#6b4444}
- .speak-btn{
-    margin-top:12px; padding:10px 20px; border:none;
-    background:linear-gradient(90deg, #e8a0bf, #c995a5);
-    color:white; border-radius:30px; font-weight:700;
-    cursor:pointer; box-shadow:0 4px 12px rgba(232,160,191,.4)
-  }
+  *{box-sizing:border-box; font-family: system-ui, sans-serif}
+  body{margin:0; background:#f6f7fb; display:flex; justify-content:center; min-height:100vh; padding:20px}
+ .app{width:100%; max-width:420px; background:white; border-radius:20px; padding:24px; box-shadow:0 10px 30px rgba(0,0,0,.08); margin:auto}
+  h1{font-size:20px; text-align:center; margin:0 0 4px}
+ .sub{color:#888; text-align:center; font-size:13px; margin-bottom:12px}
+ .cats{display:flex; gap:6px; overflow:auto; padding-bottom:10px; margin-bottom:12px}
+ .cat{white-space:nowrap; padding:6px 10px; border-radius:20px; border:1px solid #eee; background:#fff; font-size:12px; cursor:pointer}
+ .cat.active{background:#6c5ce7; color:#fff; border-color:#6c5ce7}
+ .progress{height:6px; background:#eee; border-radius:10px; overflow:hidden; margin-bottom:18px}
+ .bar{height:100%; background:#6c5ce7; width:0%; transition:.4s}
+ .card{background:#f9f9ff; border-radius:16px; padding:18px; text-align:center; margin-bottom:16px}
+ .az-word{font-size:32px; font-weight:800; margin:6px 0}
+ .az-translit{color:#999; font-size:13px}
  .options{display:grid; gap:10px}
- .opt{
-    padding:14px; border:2px solid #f3e0dd; border-radius:14px;
-    background:white; font-size:15px; font-weight:600;
-    cursor:pointer; display:flex; justify-content:space-between; transition:.2s
-  }
- .opt:hover{border-color:#e8a0bf; transform:translateY(-1px)}
- .opt.correct{border-color:#a3d9b1; background:#eafff1; color:#2d8a4e}
- .opt.wrong{border-color:#ffb8b8; background:#fff0f0; color:#d44; animation:shake.3s}
- .feedback{margin-top:14px; padding:12px; border-radius:12px; display:none; font-size:14px}
+ .opt{padding:14px; border:2px solid #eee; border-radius:12px; background:white; font-size:16px; font-weight:600; cursor:pointer; transition:.2s; text-align:left; display:flex; justify-content:space-between}
+ .opt:hover{border-color:#6c5ce7}
+ .opt.correct{border-color:#00b894; background:#e8fff5; color:#00b894}
+ .opt.wrong{border-color:#ff7675; background:#ffecec; color:#d63031}
+ .feedback{min-height:48px; margin-top:14px; padding:12px; border-radius:10px; font-size:14px; display:none}
  .feedback.show{display:block}
- .feedback.ok{background:#eafff1; color:#2d8a4e}
- .feedback.err{background:#fff0f0; color:#a33}
- .next{width:100%; margin-top:16px; padding:14px; border:none; border-radius:14px; background:#6b4444; color:white; font-weight:700; display:none; cursor:pointer}
+ .feedback.ok{background:#e8fff5; color:#00b894}
+ .feedback.err{background:#ffecec; color:#d63031}
+ .next{width:100%; margin-top:16px; padding:14px; border:none; border-radius:12px; background:#6c5ce7; color:white; font-weight:700; font-size:15px; display:none; cursor:pointer}
  .next.show{display:block}
-  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+ .stats{display:flex; justify-content:space-between; font-size:12px; color:#999; margin-bottom:10px}
 </style>
 </head>
 <body>
 <div class="app">
-  <h1> AZ → RU </h1>
-  <div class="sub">ТРЕНАЖЕР</div>
+  <h1>Az → Ru тренажер</h1>
+  <div class="sub">100 слов по категориям</div>
+  <div class="cats" id="cats"></div>
+  <div class="stats"><span id="count">1 / 100</span><span id="score">✅ 0</span></div>
   <div class="progress"><div class="bar" id="bar"></div></div>
   <div class="card">
-    <div style="font-size:10px; letter-spacing:2px; color:#c995a5">AZƏRBAYCANCA</div>
+    <div style="font-size:12px; color:#6c5ce7; font-weight:700" id="catLabel">КАТЕГОРИЯ</div>
     <div class="az-word" id="azWord">Salam</div>
-    <button class="speak-btn" onclick="speakCurrent()">🔊 Послушать по-русски</button>
-    <div id="ruHint" style="margin-top:8px; font-size:12px; color:#c4a6a6"></div>
+    <div class="az-translit" id="azTranslit">перевод</div>
   </div>
-  <div id="options" class="options"></div>
-  <div id="feedback" class="feedback"></div>
-  <button id="next" class="next">Далее →</button>
+  <div class="options" id="options"></div>
+  <div class="feedback" id="feedback"></div>
+  <button class="next" id="next">Далее →</button>
 </div>
 
 <script>
-const words = [
-  {az:"Salam", ru:"Привет", opts:["Привет","Пока","Спасибо","Да"]},
-  {az:"Sevgi", ru:"Любовь", opts:["Любовь","Счастье","Семья","Сердце"]},
-  {az:"Gəlin", ru:"Невеста", opts:["Невеста","Жених","Свадьба","Платье"]},
-  {az:"Bəy", ru:"Жених", opts:["Жених","Невеста","Друг","Брат"]},
-  {az:"Toy", ru:"Свадьба", opts:["Свадьба","Праздник","Дом","Любовь"]},
-  {az:"Üzük", ru:"Кольцо", opts:["Кольцо","Сердце","Цветы","Платье"]},
-  {az:"Gül", ru:"Цветок", opts:["Цветок","Роза","Любовь","Весна"]},
-  {az:"Gözəl", ru:"Красивый", opts:["Красивый","Нежный","Милая","Счастливый"]},
-  {az:"Xoşbəxt", ru:"Счастливый", opts:["Счастливый","Красивый","Добрый","Милый"]},
-  {az:"Ailə", ru:"Семья", opts:["Семья","Любовь","Дом","Счастье"]},
-  {az:"Öpüş", ru:"Поцелуй", opts:["Поцелуй","Любовь","Сердце","Объятие"]},
-  {az:"Ürək", ru:"Сердце", opts:["Сердце","Душа","Любовь","Жизнь"]},
+const allWords = [
+  // 1. Приветствия 10
+  {az:"Salam", ru:"Привет", cat:"Приветствия", opts:["Привет","Пока","Спасибо","Да"]},
+  {az:"Sağ ol", ru:"Спасибо", cat:"Приветствия", opts:["Спасибо","Пожалуйста","Извини","Привет"]},
+  {az:"Xahiş edirəm", ru:"Пожалуйста", cat:"Приветствия", opts:["Пожалуйста","Спасибо","Извини","Привет"]},
+  {az:"Bağışla", ru:"Извини", cat:"Приветствия", opts:["Извини","Спасибо","Привет","До свидания"]},
+  {az:"Hələlik", ru:"Пока", cat:"Приветствия", opts:["Привет","Пока","Спасибо","Да"]},
+  {az:"Sabahınız xeyir", ru:"Доброе утро", cat:"Приветствия", opts:["Доброе утро","Добрый вечер","Доброй ночи","Добрый день"]},
+  {az:"Axşamınız xeyir", ru:"Добрый вечер", cat:"Приветствия", opts:["Доброе утро","Добрый вечер","Добрый день","Пока"]},
+  {az:"Gecəniz xeyrə", ru:"Доброй ночи", cat:"Приветствия", opts:["Доброй ночи","Доброе утро","Привет","Пока"]},
+  {az:"Necəsən?", ru:"Как дела?", cat:"Приветствия", opts:["Как дела?","Как тебя зовут?","Где ты?","Сколько?"]},
+  {az:"Yaxşıyam", ru:"Хорошо", cat:"Приветствия", opts:["Плохо","Хорошо","Нормально","Отлично"]},
+
+  // 2. Семья 10
+  {az:"Ana", ru:"Мама", cat:"Семья", opts:["Мама","Папа","Брат","Сестра"]},
+  {az:"Ata", ru:"Папа", cat:"Семья", opts:["Мама","Папа","Дед","Брат"]},
+  {az:"Qardaş", ru:"Брат", cat:"Семья", opts:["Сестра","Брат","Друг","Папа"]},
+  {az:"Bacı", ru:"Сестра", cat:"Семья", opts:["Брат","Сестра","Мама","Тетя"]},
+  {az:"Ailə", ru:"Семья", cat:"Семья", opts:["Семья","Друг","Работа","Школа"]},
+  {az:"Uşaq", ru:"Ребенок", cat:"Семья", opts:["Ребенок","Взрослый","Друг","Семья"]},
+  {az:"Baba", ru:"Дедушка", cat:"Семья", opts:["Бабушка","Дедушка","Папа","Дядя"]},
+  {az:"Nənə", ru:"Бабушка", cat:"Семья", opts:["Бабушка","Дедушка","Мама","Сестра"]},
+  {az:"Dost", ru:"Друг", cat:"Семья", opts:["Враг","Друг","Брат","Семья"]},
+  {az:"Sevgi", ru:"Любовь", cat:"Семья", opts:["Любовь","Дружба","Ненависть","Радость"]},
+
+  // 3. Дом 10
+  {az:"Ev", ru:"Дом", cat:"Дом", opts:["Дом","Улица","Город","Комната"]},
+  {az:"Qapı", ru:"Дверь", cat:"Дом", opts:["Окно","Дверь","Стена","Пол"]},
+  {az:"Pəncərə", ru:"Окно", cat:"Дом", opts:["Дверь","Окно","Крыша","Пол"]},
+  {az:"Masa", ru:"Стол", cat:"Дом", opts:["Стул","Стол","Диван","Кровать"]},
+  {az:"Stul", ru:"Стул", cat:"Дом", opts:["Стол","Стул","Шкаф","Кровать"]},
+  {az:"Yataq", ru:"Кровать", cat:"Дом", opts:["Стол","Кровать","Диван","Стул"]},
+  {az:"Mətbəx", ru:"Кухня", cat:"Дом", opts:["Кухня","Ванная","Комната","Балкон"]},
+  {az:"İşıq", ru:"Свет", cat:"Дом", opts:["Свет","Тень","Вода","Огонь"]},
+  {az:"Açar", ru:"Ключ", cat:"Дом", opts:["Замок","Ключ","Дверь","Окно"]},
+  {az:"Həyət", ru:"Двор", cat:"Дом", opts:["Двор","Дом","Сад","Улица"]},
+
+  // 4. Еда 10
+  {az:"Su", ru:"Вода", cat:"Еда", opts:["Огонь","Вода","Хлеб","Молоко"]},
+  {az:"Çörək", ru:"Хлеб", cat:"Еда", opts:["Сыр","Хлеб","Мясо","Вода"]},
+  {az:"Ət", ru:"Мясо", cat:"Еда", opts:["Хлеб","Мясо","Рыба","Сыр"]},
+  {az:"Düyü", ru:"Рис", cat:"Еда", opts:["Рис","Хлеб","Суп","Мясо"]},
+  {az:"Yumurta", ru:"Яйцо", cat:"Еда", opts:["Яйцо","Молоко","Мясо","Хлеб"]},
+  {az:"Süd", ru:"Молоко", cat:"Еда", opts:["Вода","Молоко","Чай","Кофе"]},
+  {az:"Çay", ru:"Чай", cat:"Еда", opts:["Чай","Кофе","Вода","Сок"]},
+  {az:"Duz", ru:"Соль", cat:"Еда", opts:["Сахар","Соль","Перец","Мясо"]},
+  {az:"Şəkər", ru:"Сахар", cat:"Еда", opts:["Соль","Сахар","Мука","Рис"]},
+  {az:"Meyvə", ru:"Фрукт", cat:"Еда", opts:["Овощ","Фрукт","Мясо","Хлеб"]},
+
+  // 5. Город и транспорт 10
+  {az:"Yol", ru:"Дорога", cat:"Город", opts:["Дорога","Мост","Дом","Лес"]},
+  {az:"Maşın", ru:"Машина", cat:"Город", opts:["Машина","Поезд","Самолет","Велосипед"]},
+  {az:"Avtobus", ru:"Автобус", cat:"Город", opts:["Автобус","Машина","Поезд","Трамвай"]},
+  {az:"Şəhər", ru:"Город", cat:"Город", opts:["Город","Деревня","Улица","Дом"]},
+  {az:"Küçə", ru:"Улица", cat:"Город", opts:["Город","Улица","Дорога","Дом"]},
+  {az:"Bazar", ru:"Рынок", cat:"Город", opts:["Магазин","Рынок","Школа","Больница"]},
+  {az:"Məktəb", ru:"Школа", cat:"Город", opts:["Работа","Школа","Университет","Дом"]},
+  {az:"Xəstəxana", ru:"Больница", cat:"Город", opts:["Школа","Больница","Магазин","Банк"]},
+  {az:"Park", ru:"Парк", cat:"Город", opts:["Парк","Лес","Сад","Двор"]},
+  {az:"Körpü", ru:"Мост", cat:"Город", opts:["Дорога","Мост","Улица","Дом"]},
+
+  // 6. Прилагательные 10
+  {az:"Gözəl", ru:"Красивый", cat:"Прилагательные", opts:["Красивый","Умный","Большой","Маленький"]},
+  {az:"Böyük", ru:"Большой", cat:"Прилагательные", opts:["Маленький","Большой","Быстрый","Новый"]},
+  {az:"Kiçik", ru:"Маленький", cat:"Прилагательные", opts:["Большой","Маленький","Высокий","Толстый"]},
+  {az:"Yaxşı", ru:"Хороший", cat:"Прилагательные", opts:["Плохой","Хороший","Красивый","Большой"]},
+  {az:"Pis", ru:"Плохой", cat:"Прилагательные", opts:["Хороший","Плохой","Маленький","Новый"]},
+  {az:"Yeni", ru:"Новый", cat:"Прилагательные", opts:["Старый","Новый","Большой","Маленький"]},
+  {az:"Köhnə", ru:"Старый", cat:"Прилагательные", opts:["Новый","Старый","Молодой","Большой"]},
+  {az:"Tez", ru:"Быстрый", cat:"Прилагательные", opts:["Медленный","Быстрый","Большой","Маленький"]},
+  {az:"Ucuz", ru:"Дешевый", cat:"Прилагательные", opts:["Дорогой","Дешевый","Большой","Хороший"]},
+  {az:"Baha", ru:"Дорогой", cat:"Прилагательные", opts:["Дешевый","Дорогой","Красивый","Плохой"]},
+
+  // 7. Время и природа 10
+  {az:"Gün", ru:"День", cat:"Время", opts:["Ночь","День","Утро","Вечер"]},
+  {az:"Gecə", ru:"Ночь", cat:"Время", opts:["День","Ночь","Утро","Зима"]},
+  {az:"Səhər", ru:"Утро", cat:"Время", opts:["Утро","Вечер","Ночь","День"]},
+  {az:"Axşam", ru:"Вечер", cat:"Время", opts:["Утро","Вечер","День","Ночь"]},
+  {az:"İl", ru:"Год", cat:"Время", opts:["Месяц","Год","День","Неделя"]},
+  {az:"Ay", ru:"Месяц", cat:"Время", opts:["Год","Месяц","День","Солнце"]},
+  {az:"Günəş", ru:"Солнце", cat:"Время", opts:["Луна","Солнце","Звезда","Небо"]},
+  {az:"Ay (səma)", ru:"Луна", cat:"Время", opts:["Солнце","Луна","Звезда","Небо"]},
+  {az:"Su (təbiət)", ru:"Вода", cat:"Время", opts:["Огонь","Вода","Земля","Воздух"]},
+  {az:"Dağ", ru:"Гора", cat:"Время", opts:["Море","Гора","Река","Лес"]},
+
+  // 8. Глаголы 10
+  {az:"Getmək", ru:"Идти", cat:"Глаголы", opts:["Идти","Бежать","Стоять","Сидеть"]},
+  {az:"Gəlmək", ru:"Приходить", cat:"Глаголы", opts:["Уходить","Приходить","Идти","Бежать"]},
+  {az:"Etmək", ru:"Делать", cat:"Глаголы", opts:["Делать","Говорить","Думать","Брать"]},
+  {az:"Demək", ru:"Говорить", cat:"Глаголы", opts:["Молчать","Говорить","Слушать","Кричать"]},
+  {az:"Bilmək", ru:"Знать", cat:"Глаголы", opts:["Знать","Думать","Забыть","Помнить"]},
+  {az:"Sevmək", ru:"Любить", cat:"Глаголы", opts:["Любить","Ненавидеть","Ждать","Искать"]},
+  {az:"İstəmək", ru:"Хотеть", cat:"Глаголы", opts:["Хотеть","Мочь","Делать","Идти"]},
+  {az:"Yemək", ru:"Есть", cat:"Глаголы", opts:["Пить","Есть","Спать","Идти"]},
+  {az:"İçmək", ru:"Пить", cat:"Глаголы", opts:["Есть","Пить","Спать","Готовить"]},
+  {az:"Yatmaq", ru:"Спать", cat:"Глаголы", opts:["Спать","Вставать","Сидеть","Бежать"]},
+
+  // 9. Числа и цвета 10
+  {az:"Bir", ru:"Один", cat:"Числа/Цвета", opts:["Один","Два","Три","Пять"]},
+  {az:"İki", ru:"Два", cat:"Числа/Цвета", opts:["Один","Два","Три","Четыре"]},
+  {az:"Üç", ru:"Три", cat:"Числа/Цвета", opts:["Два","Три","Четыре","Пять"]},
+  {az:"Qırmızı", ru:"Красный", cat:"Числа/Цвета", opts:["Красный","Синий","Черный","Белый"]},
+  {az:"Mavi", ru:"Синий", cat:"Числа/Цвета", opts:["Синий","Красный","Зеленый","Желтый"]},
+  {az:"Ağ", ru:"Белый", cat:"Числа/Цвета", opts:["Черный","Белый","Красный","Синий"]},
+  {az:"Qara", ru:"Черный", cat:"Числа/Цвета", opts:["Белый","Черный","Синий","Красный"]},
+  {az:"Yaşıl", ru:"Зеленый", cat:"Числа/Цвета", opts:["Зеленый","Синий","Желтый","Красный"]},
+  {az:"Sarı", ru:"Желтый", cat:"Числа/Цвета", opts:["Желтый","Синий","Зеленый","Красный"]},
+  {az:"Çox", ru:"Много", cat:"Числа/Цвета", opts:["Мало","Много","Один","Все"]},
+
+  // 10. Учеба и работа 10
+  {az:"Kitab", ru:"Книга", cat:"Учеба", opts:["Книга","Ручка","Стол","Школа"]},
+  {az:"Qələm", ru:"Ручка", cat:"Учеба", opts:["Книга","Ручка","Карандаш","Стол"]},
+  {az:"İş", ru:"Работа", cat:"Учеба", opts:["Отдых","Работа","Учеба","Игра"]},
+  {az:"Pul", ru:"Деньги", cat:"Учеба", opts:["Работа","Деньги","Время","Вода"]},
+  {az:"Vaxt", ru:"Время", cat:"Учеба", opts:["Деньги","Время","День","Год"]},
+  {az:"Sual", ru:"Вопрос", cat:"Учеба", opts:["Ответ","Вопрос","Книга","Слово"]},
+  {az:"Cavab", ru:"Ответ", cat:"Учеба", opts:["Вопрос","Ответ","Слово","Книга"]},
+  {az:"Dil", ru:"Язык", cat:"Учеба", opts:["Язык","Слово","Книга","Ручка"]},
+  {az:"Söz", ru:"Слово", cat:"Учеба", opts:["Язык","Слово","Книга","Вопрос"]},
+  {az:"Dərs", ru:"Урок", cat:"Учеба", opts:["Урок","Школа","Работа","Книга"]},
 ];
 
-let idx=0, locked=false;
+let currentCat = "Все";
+let words = [...allWords];
+let idx = 0, score = 0, locked = false;
 
-function speak(t){
-  window.speechSynthesis.cancel();
-  let u = new SpeechSynthesisUtterance(t);
-  u.lang='ru-RU';
-  u.rate=0.85;
-  let voices = window.speechSynthesis.getVoices();
-  let ru = voices.find(v=>v.lang.includes('ru'));
-  if(ru) u.voice = ru;
-  window.speechSynthesis.speak(u);
+function initCats(){
+  const cats = ["Все",...new Set(allWords.map(w=>w.cat))];
+  const cont = document.getElementById('cats');
+  cont.innerHTML = "";
+  cats.forEach(c=>{
+    const b = document.createElement('button');
+    b.className = "cat" + (c===currentCat?" active":"");
+    b.textContent = c;
+    b.onclick = ()=>{
+      currentCat=c;
+      words = c==="Все"? [...allWords] : allWords.filter(w=>w.cat===c);
+      idx=0; score=0;
+      document.querySelectorAll('.cat').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      render();
+    };
+    cont.appendChild(b);
+  });
 }
 
-function speakCurrent(){
-  speak(words[idx].ru);
-  document.getElementById('ruHint').textContent = words[idx].ru + " 🔊";
-}
+function shuffle(a){return [...a].sort(()=>Math.random()-0.5)}
 
 function render(){
   locked=false;
-  let w=words[idx];
-  document.getElementById('azWord').textContent=w.az;
-  document.getElementById('ruHint').textContent='';
-  document.getElementById('bar').style.width=(idx/words.length*100)+'%';
-  let c=document.getElementById('options');
-  c.innerHTML='';
-  [...w.opts].sort(()=>Math.random()-0.5).forEach(o=>{
-    let b=document.createElement('button');
-    b.className='opt';
-    b.innerHTML=`<span>${o}</span><span>🤍</span>`;
-    b.onclick=()=>{
-      if(locked) return;
-      locked=true;
-      let fb=document.getElementById('feedback');
-      if(o===w.ru){
-        b.classList.add('correct');
-        fb.textContent=`✅ Правильно! ${w.az} = ${w.ru}`;
-        fb.className='feedback show ok';
-        speak(w.ru);
-      } else {
-        b.classList.add('wrong');
-        document.querySelectorAll('.opt').forEach(x=>{
-          if(x.textContent.includes(w.ru)) x.classList.add('correct')
-        });
-        fb.innerHTML=`❌ Неправильно: <b>${o}</b><br>✅ Правильно: <b>${w.az} = ${w.ru}</b>`;
-        fb.className='feedback show err';
-        setTimeout(()=>speak(w.ru),300);
-      }
-      fb.style.display='block';
-      document.getElementById('next').classList.add('show');
-    };
-    c.appendChild(b);
+  if(words.length===0) return;
+  const w = words[idx];
+  document.getElementById('catLabel').textContent = w.cat.toUpperCase();
+  document.getElementById('azWord').textContent = w.az;
+  document.getElementById('azTranslit').textContent = w.ru + " ← правильный ответ";
+  document.getElementById('count').textContent = `${idx+1} / ${words.length}`;
+  document.getElementById('bar').style.width = `${(idx/words.length)*100}%`;
+  const opts = shuffle(w.opts);
+  const cont = document.getElementById('options');
+  cont.innerHTML = "";
+  opts.forEach(o=>{
+    const b = document.createElement('button');
+    b.className = "opt";
+    b.innerHTML = `<span>${o}</span><span>→</span>`;
+    b.onclick = ()=> check(b,o,w.ru);
+    cont.appendChild(b);
   });
-  document.getElementById('feedback').style.display='none';
-  document.getElementById('next').className='next';
+  document.getElementById('feedback').className="feedback";
+  document.getElementById('feedback').style.display="none";
+  document.getElementById('next').className="next";
+  document.getElementById('score').textContent = `✅ ${score}`;
 }
 
-document.getElementById('next').onclick=()=>{
-  idx=(idx+1)%words.length;
-  if(idx===0) words.sort(()=>Math.random()-0.5);
-  render();
-};
+function check(btn, chosen, correct){
+  if(locked) return;
+  locked=true;
+  const fb = document.getElementById('feedback');
+  const all = document.querySelectorAll('.opt');
+  if(chosen===correct){
+    btn.classList.add('correct');
+    fb.textContent = `✅ Правильно! ${words[idx].az} = ${correct}`;
+    fb.className = "feedback show ok";
+    fb.style.display="block";
+    score++;
+  } else {
+    btn.classList.add('wrong');
+    all.forEach(x=>{ if(x.textContent.includes(correct)) x.classList.add('correct') });
+    fb.innerHTML = `❌ Неправильно. Вы выбрали: <b>${chosen}</b><br>✅ Правильно: <b>${words[idx].az} = ${correct}</b>`;
+    fb.className = "feedback show err";
+    fb.style.display="block";
+  }
+  document.getElementById('score').textContent = `✅ ${score}`;
+  document.getElementById('next').classList.add('show');
+}
 
-window.speechSynthesis.onvoiceschanged = ()=> window.speechSynthesis.getVoices();
+document.getElementById('next').onclick = ()=>{
+  idx++;
+  if(idx>=words.length){
+    alert(`Готово! Категория ${currentCat}: ${score}/${words.length}`);
+    idx=0; score=0;
+  }
+  render();
+}
+
+initCats();
 render();
 </script>
 </body>
